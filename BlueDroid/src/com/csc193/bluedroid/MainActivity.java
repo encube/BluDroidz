@@ -13,16 +13,22 @@ import android.provider.ContactsContract.CommonDataKinds.StructuredName;
 import android.provider.ContactsContract.Data;
 import android.provider.ContactsContract.RawContacts;
 import android.app.Activity;
+import android.app.PendingIntent;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
+import android.content.BroadcastReceiver;
 import android.content.ContentProviderOperation;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.OperationApplicationException;
 import android.database.Cursor;
+import android.telephony.SmsManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.View;
+import android.widget.Toast;
 
 public class MainActivity extends Activity {
 
@@ -30,17 +36,14 @@ public class MainActivity extends Activity {
 	private static final int REQUEST_ENABLE_BT = 1000;
 	private static final int REQUEST_DISCOVERABLE_BT = 1001;
 	private static String name = "client bluedroid";
-	private static UUID uuid = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");;
+	private static UUID uuid = UUID
+			.fromString("00001101-0000-1000-8000-00805F9B34FB");;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_main);
 		mBluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
-		//checkBTState();
-		//startListener();
-		fetchContactsThreader();
-		fetchMessagesThreader();
 	}
 
 	@Override
@@ -48,7 +51,7 @@ public class MainActivity extends Activity {
 		getMenuInflater().inflate(R.menu.activity_main, menu);
 		return true;
 	}
-	
+
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
 		// TODO Auto-generated method stub
@@ -66,7 +69,7 @@ public class MainActivity extends Activity {
 			}
 		}
 	}
-	
+
 	private void checkBTState() {
 		if (mBluetoothAdapter == null) {
 			Log.d("bluetooth", "no adapter found");
@@ -89,7 +92,9 @@ public class MainActivity extends Activity {
 	}
 
 	public void onConnectClicked(View view) {
-
+		Log.d("onClick", "connect clicked");
+		fetchContactsThreader();
+		fetchMessagesThreader();
 	}
 
 	private void fetchContactsThreader() {
@@ -176,53 +181,115 @@ public class MainActivity extends Activity {
 		}
 	}
 
-	private void sendMessage(String recipient, String message) {
+	//TODO test this
+	private void sendSMS(String phoneNumber, String message) {
 
+		String SENT = "SMS_SENT";
+		String DELIVERED = "SMS_DELIVERED";
+
+		PendingIntent sentPI = PendingIntent.getBroadcast(this, 0, new Intent(
+				SENT), 0);
+
+		PendingIntent deliveredPI = PendingIntent.getBroadcast(this, 0,
+				new Intent(DELIVERED), 0);
+
+		// —when the SMS has been sent—
+		registerReceiver(new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context arg0, Intent arg1) {
+				switch (getResultCode()) {
+				case Activity.RESULT_OK:
+					Toast.makeText(getBaseContext(), "SENT", Toast.LENGTH_SHORT)
+							.show();
+					break;
+				case SmsManager.RESULT_ERROR_GENERIC_FAILURE:
+					Toast.makeText(getBaseContext(), "Generic failure",
+							Toast.LENGTH_SHORT).show();
+					break;
+				case SmsManager.RESULT_ERROR_NO_SERVICE:
+					Toast.makeText(getBaseContext(), "No service",
+							Toast.LENGTH_SHORT).show();
+					break;
+				case SmsManager.RESULT_ERROR_NULL_PDU:
+					Toast.makeText(getBaseContext(), "Null PDU",
+							Toast.LENGTH_SHORT).show();
+					break;
+				case SmsManager.RESULT_ERROR_RADIO_OFF:
+					Toast.makeText(getBaseContext(), "Radio off",
+							Toast.LENGTH_SHORT).show();
+					break;
+				}
+			}
+		}, new IntentFilter(SENT));
+
+		// —when the SMS has been delivered—
+		registerReceiver(new BroadcastReceiver() {
+			@Override
+			public void onReceive(Context arg0, Intent arg1) {
+				switch (getResultCode()) {
+				case Activity.RESULT_OK:
+					Toast.makeText(getBaseContext(), "SMS delivered",
+							Toast.LENGTH_SHORT).show();
+					break;
+				case Activity.RESULT_CANCELED:
+					Toast.makeText(getBaseContext(), "SMS not delivered",
+							Toast.LENGTH_SHORT).show();
+					break;
+				}
+			}
+		}, new IntentFilter(DELIVERED));
+
+		SmsManager sms = SmsManager.getDefault();
+		sms.sendTextMessage(phoneNumber, null, message, sentPI, deliveredPI);
 	}
 
 	private class AcceptThread extends Thread {
-	    private final BluetoothServerSocket mmServerSocket;
-	 
-	    public AcceptThread() {
-	        // Use a temporary object that is later assigned to mmServerSocket,
-	        // because mmServerSocket is final
-	        BluetoothServerSocket tmp = null;
-	        try {
-	            // MY_UUID is the app's UUID string, also used by the client code
-	            tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(name, uuid);
-	        } catch (IOException e) { }
-	        mmServerSocket = tmp;
-	    }
-	 
-	    public void run() {
-	        BluetoothSocket socket = null;
-	        // Keep listening until exception occurs or a socket is returned
-	        while (true) {
-	            try {
-	                socket = mmServerSocket.accept();
-	            } catch (IOException e) {
-	                break;
-	            }
-	            // If a connection was accepted
-	            if (socket != null) {
-	                // Do work to manage the connection (in a separate thread)
-	            	Log.d("listner", "accepted connection");
-	                try {
+		private final BluetoothServerSocket mmServerSocket;
+
+		public AcceptThread() {
+			// Use a temporary object that is later assigned to mmServerSocket,
+			// because mmServerSocket is final
+			BluetoothServerSocket tmp = null;
+			try {
+				// MY_UUID is the app's UUID string, also used by the client
+				// code
+				tmp = mBluetoothAdapter.listenUsingRfcommWithServiceRecord(
+						name, uuid);
+			} catch (IOException e) {
+			}
+			mmServerSocket = tmp;
+		}
+
+		public void run() {
+			BluetoothSocket socket = null;
+			// Keep listening until exception occurs or a socket is returned
+			while (true) {
+				try {
+					socket = mmServerSocket.accept();
+				} catch (IOException e) {
+					break;
+				}
+				// If a connection was accepted
+				if (socket != null) {
+					// Do work to manage the connection (in a separate thread)
+					Log.d("listner", "accepted connection");
+					try {
 						mmServerSocket.close();
 					} catch (IOException e) {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-	                break;
-	            }
-	        }
-	    }
-	 
-	    /** Will cancel the listening socket, and cause the thread to finish */
-	    public void cancel() {
-	        try {
-	            mmServerSocket.close();
-	        } catch (IOException e) { }
-	    }
+					break;
+				}
+			}
+		}
+
+		/** Will cancel the listening socket, and cause the thread to finish */
+		public void cancel() {
+			try {
+				mmServerSocket.close();
+			} catch (IOException e) {
+			}
+		}
 	}
 }
