@@ -1,5 +1,8 @@
 package bluedroid;
 import java.awt.BorderLayout;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
+
 import javax.swing.JButton;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -72,12 +75,32 @@ public class bluedroidInbox extends javax.swing.JFrame {
 						jPanel1.add(contactNum);
 						contactNum.setText("Contact Number");
 						contactNum.setPreferredSize(new java.awt.Dimension(252, 35));
+					
+						contactNum.addMouseListener(new MouseAdapter(){
+							@Override
+							public void mouseClicked(MouseEvent e){
+								contactNum.setText("");
+								
+							}
+							
+						});
+					
 					}
 					{
 						messageBox = new JTextArea();
 						jPanel1.add(messageBox);
 						messageBox.setText("Type your message");
 						messageBox.setPreferredSize(new java.awt.Dimension(249, 239));
+					
+						messageBox.addMouseListener(new MouseAdapter(){
+							@Override
+							public void mouseClicked(MouseEvent e){
+								messageBox.setText("");
+								
+							}
+							
+						});
+					
 					}
 					{
 						send = new JButton();

@@ -1,10 +1,19 @@
 package bluedroid;
 
-import javax.swing.*;
+import java.awt.Dimension;
+import java.awt.Image;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
-import java.awt.event.*;
-import bluedroid.bluedroidContacts;
-
+import javax.swing.JApplet;
+import javax.swing.JButton;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JPanel;
+import javax.swing.RowFilter;
+import javax.swing.SwingUtilities;
+import org.jdesktop.application.Application;
+import javax.swing.ImageIcon;
 
 /**
 * This code was edited or generated using CloudGarden's Jigloo
@@ -18,100 +27,86 @@ import bluedroid.bluedroidContacts;
 * THIS MACHINE, SO JIGLOO OR THIS CODE CANNOT BE USED
 * LEGALLY FOR ANY CORPORATE OR COMMERCIAL PURPOSE.
 */
-public class bluedroidHome extends javax.swing.JFrame {
-
-	{
-		//Set Look & Feel
-		try {
-			javax.swing.UIManager.setLookAndFeel("javax.swing.plaf.nimbus.NimbusLookAndFeel");
-		} catch(Exception e) {
-			e.printStackTrace();
-		}
-	}
-
-	private JMenuBar jMenuBar1;
-	private JMenu help;
-	private JMenuItem setting;
-	private JMenuItem inbox;
-	private JMenuItem contact;
-	private JMenuItem connects;
-	private JMenu menu;
+public class bluedroidHome extends javax.swing.JApplet {
+	private JButton connect;
+	private JPanel jPanel1;
+	private JButton settings;
+	private JButton inbox;
+	private JButton contacts;
 
 	/**
-	* Auto-generated main method to display this JFrame
+	* Auto-generated main method to display this 
+	* JApplet inside a new JFrame.
 	*/
 	public static void main(String[] args) {
 		SwingUtilities.invokeLater(new Runnable() {
+			public void run() {
+				JFrame frame = new JFrame();
+				bluedroidHome inst = new bluedroidHome();
+				frame.getContentPane().add(inst);
+				((JComponent)frame.getContentPane()).setPreferredSize(inst.getSize());
+				frame.pack();
+				frame.setVisible(true);
+			}
 		});
+
 	}
 	
 	public bluedroidHome() {
 		super();
 		initGUI();
-		
-		
 	}
 	
 	private void initGUI() {
 		try {
-			this.setSize(310, 285);
+			this.setSize(247, 228);
+			this.setName("BlueDroid");
 			{
-				jMenuBar1 = new JMenuBar();
-				setJMenuBar(jMenuBar1);
+				jPanel1 = new JPanel();
+				getContentPane().add(jPanel1);
+				jPanel1.setPreferredSize(new java.awt.Dimension(232, 233));
 				{
-					menu = new JMenu();
-					jMenuBar1.add(menu);
-					menu.setText("Menu");
-					menu.setFont(new java.awt.Font("Arial",1,16));
-					{
-						connects = new JMenuItem();
-						menu.add(connects);
-						connects.setText("Connect");
-						connects.setFont(new java.awt.Font("Arial",0,14));
-						
-						//adding action listener to menu items
-						connects.addActionListener(
-							new ActionListener(){
-								public void actionPerformed(ActionEvent e)
-								{
-									test test = new test();
-									//bluedroidContacts.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-									test.setVisible(true);
-								}
-							}
-						);
-						
-						
-					}
-					{
-						contact = new JMenuItem();
-						menu.add(contact);
-						contact.setText("Contacts");
-						
-						//adding action listener to menu items
-						contact.addActionListener(
+					ImageIcon connectImage = new ImageIcon("src/bluedroid/Connect.jpg");
+					connect = new JButton(connectImage);
+					jPanel1.add(connect);
+					connect.setPreferredSize(new java.awt.Dimension(103, 103));
+					connect.setBorderPainted(false);
+					connect.setFocusPainted(false);
+					//connect.setContentAreaFilled(false);
+				
+				}
+				{
+					ImageIcon contactsImage = new ImageIcon("src/bluedroid/contacts2.png");
+					contacts = new JButton(contactsImage);
+					jPanel1.add(contacts);
+					contacts.setPreferredSize(new java.awt.Dimension(100, 100));
+					contacts.setBorderPainted(false);
+					contacts.setFocusPainted(false);
+					//contacts.setContentAreaFilled(false);
+					contacts.addActionListener(
 							new ActionListener(){
 								public void actionPerformed(ActionEvent e)
 								{
 									bluedroidContacts bluedroidContacts = new bluedroidContacts();
-									//bluedroidContacts.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+									//bluedroidInbox.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 									bluedroidContacts.setVisible(true);
-									
-									
 								}
 							}
 						);
-						
-						
-					}
-					{
-						inbox = new JMenuItem();
-						menu.add(inbox);
-						inbox.setText("Inbox");
-						
-						
-						//adding action listener to menu items
-						inbox.addActionListener(
+
+					
+				}
+				{
+					ImageIcon inboxImage = new ImageIcon("src/bluedroid/inbox.png");
+					inbox = new JButton(inboxImage);
+					jPanel1.add(inbox);
+					inbox.setSize(100, 100);
+					inbox.setPreferredSize(new java.awt.Dimension(100, 100));
+					inbox.setBorderPainted(false);
+					inbox.setFocusPainted(false);
+					//inbox.setContentAreaFilled(false);
+				
+					inbox.addActionListener(
 							new ActionListener(){
 								public void actionPerformed(ActionEvent e)
 								{
@@ -121,37 +116,20 @@ public class bluedroidHome extends javax.swing.JFrame {
 								}
 							}
 						);
-						
-						
-						
-					}
+					
 				}
 				{
-					help = new JMenu();
-					jMenuBar1.add(help);
-					help.setText("Help");
-					help.setFont(new java.awt.Font("Arial",1,16));
-					{
-						setting = new JMenuItem();
-						help.add(setting);
-						setting.setText("Settings");
-						setting.setFont(new java.awt.Font("Arial",0,14));
-						
-						//adding action listener to menu items
-						setting.addActionListener(
-							new ActionListener(){
-								public void actionPerformed(ActionEvent e)
-								{
-									bluedroidSettings bluedroidSettings = new bluedroidSettings();
-									//bluedroidInbox.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-									bluedroidSettings.setVisible(true);
-								}
-							}
-						);
-						
-					}
+					ImageIcon settingsImage = new ImageIcon("src/bluedroid/settings.png");
+					settings = new JButton(settingsImage);
+					jPanel1.add(settings);
+					settings.setSize(100, 100);
+					settings.setPreferredSize(new java.awt.Dimension(100, 100));
+					settings.setBorderPainted(false);
+					settings.setFocusPainted(false);
+					//settings.setContentAreaFilled(false);
 				}
 			}
+			Application.getInstance().getContext().getResourceMap(getClass()).injectComponents(this);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
